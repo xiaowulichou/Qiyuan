@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zqy.mybatis.mapper.EmpMapper">
+    <resultMap id="baseEmpMap" type="com.zqy.mybatis.pojo.Emp">
+        <id property="id" column="id"></id>
+        <result property="name" column="name"></result>
+        <result property="gender" column="gender"></result>
+        <result property="salary" column="salary"></result>
+        <result property="joinDate" column="join_date"></result>
+        <result property="deptId" column="dept_id"></result>
+    </resultMap>
+
+    <!-- **************************************************************************************************************** -->
+    <resultMap id="empDeptMap" type="com.zqy.mybatis.pojo.Emp" extends="baseEmpMap">
+        <result property="dept.id" column="did" ></result>
+        <result property="dept.name" column="dname" ></result>
+    </resultMap>
+    <!--Emp getEmpAndDeptByEid(@Param("id") int id);-->
+    <select id="getEmpAndDeptById" resultMap="empDeptMap">
+        select e.*,d.id as did , d.name as dname from emp e left join dept d on e.dept_id = d.id where e.id = #{id}
+    </select>
+    <!-- **************************************************************************************************************** -->
+
+    <resultMap id="empDeptMap2" type="com.zqy.mybatis.pojo.Emp" extends="baseEmpMap">
+        <!-- association就是用来处理一对一 或者 多对一 -->
+        <association property="dept" javaType="com.zqy.mybatis.pojo.Dept">
+            <id property="id" column="did" ></id>
+            <result property="name" column="dname"></result>
+        </association>
+    </resultMap>
+    <!--Emp getEmpAndDeptById2(@Param("id") int id);-->
+    <select id="getEmpAndDeptById2" resultMap="empDeptMap2">
+        select e.*,d.id as did , d.name as dname from emp e left join dept d on e.dept_id = d.id where e.id = #{id}
+    </select>
+
+    <!-- **************************************************************************************************************** -->
+
+    <resultMap id="empDeptMap3" type="com.zqy.mybatis.pojo.Emp" extends="baseEmpMap">
+        <!-- association就是用来处理一对一 或者 多对一 -->
+        <association property="dept" javaType="com.zqy.mybatis.pojo.Dept"
+                     select="com.zqy.mybatis.mapper.DeptMapper.findById" column="dept_id">
+        </association>
+        <!--select="命名空间名.方法名" -->
+    </resultMap>
+    <!--Emp getEmpAndDeptById3(@Param("id") int id);-->
+    <select id="getEmpAndDeptById3" resultMap="empDeptMap3">
+        select * from emp where id = #{id}
+    </select>
+
+
+</mapper>
